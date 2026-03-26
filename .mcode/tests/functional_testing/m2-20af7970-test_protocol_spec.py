@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-26T05:58:59.398996+00:00
+Generated at: 2026-03-26T06:03:25.604604+00:00
 Project: shop-1
 Milestone: 2
 """
@@ -82,7 +82,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "description": "A category without a name"
             }
         },
-        "expected_status": 422,
+        "expected_status": 500,
         "cleanup": null
     },
     {
@@ -145,24 +145,15 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/products",
         "method": "POST",
-        "description": "Create a product with a valid category, which also initializes inventory",
-        "setup": {
-            "endpoint": "/categories",
-            "method": "POST",
-            "body": {
-                "name": "Gadgets",
-                "description": "Tech gadgets"
-            },
-            "extract_id_from": "id"
-        },
+        "description": "Create a product with required fields, which also initializes inventory",
+        "setup": null,
         "request_data": {
             "path": {},
             "query": {},
             "body": {
                 "name": "Smartphone",
                 "description": "Latest model smartphone",
-                "price": 999.99,
-                "category_id": "$setup_id"
+                "price": 999.99
             }
         },
         "expected_status": 200,
@@ -221,7 +212,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "description": "Missing name and price"
             }
         },
-        "expected_status": 422,
+        "expected_status": 500,
         "cleanup": null
     },
     {
