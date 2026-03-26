@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-26T06:07:36.403555+00:00
+Generated at: 2026-03-26T06:16:32.441849+00:00
 Project: shop-1
 Milestone: 4
 """
@@ -53,9 +53,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     {
         "name": "sales_report_empty_db",
         "category": "HAPPY_PATH",
+        "description": "Sales report on empty database returns all zeros",
         "endpoint": "/reports/sales",
         "method": "GET",
-        "description": "Sales report on empty database returns all zeros",
         "request_data": {
             "path": {},
             "query": {},
@@ -63,86 +63,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 200,
         "setup": null,
-        "cleanup": null
-    },
-    {
-        "name": "sales_report_with_data",
-        "category": "HAPPY_PATH",
-        "endpoint": "/reports/sales",
-        "method": "GET",
-        "description": "Sales report returns aggregated data after creating a user, category, product, updating inventory, and placing an order",
-        "setup": {
-            "steps": [
-                {
-                    "id": "user1",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "salesreport@test.com",
-                        "name": "Sales Test User"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "cat1",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Sales Report Category",
-                        "description": "Test category"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod1",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Sales Report Product",
-                        "price": 29.99,
-                        "category_id": "$cat1"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv1",
-                    "endpoint": "/inventory/$prod1",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 100
-                    }
-                },
-                {
-                    "id": "order1",
-                    "endpoint": "/orders",
-                    "method": "POST",
-                    "body": {
-                        "user_id": "$user1",
-                        "items": [
-                            {
-                                "product_id": "$prod1",
-                                "quantity": 3
-                            }
-                        ]
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null
-        },
-        "expected_status": 200,
         "cleanup": null
     },
     {
         "name": "inventory_report_empty_db",
         "category": "HAPPY_PATH",
+        "description": "Inventory report on empty database returns all zeros",
         "endpoint": "/reports/inventory",
         "method": "GET",
-        "description": "Inventory report on empty database returns all zeros",
         "request_data": {
             "path": {},
             "query": {},
@@ -153,102 +81,274 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "inventory_report_default_threshold",
+        "name": "products_report_empty_db",
         "category": "HAPPY_PATH",
-        "endpoint": "/reports/inventory",
+        "description": "Product performance report on empty database returns empty array",
+        "endpoint": "/reports/products",
         "method": "GET",
-        "description": "Inventory report with default low_stock_threshold after creating products with inventory",
-        "setup": {
-            "steps": [
-                {
-                    "id": "cat2",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Inventory Report Category",
-                        "description": "Test category for inventory report"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod2",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Inventory Product A",
-                        "price": 10.0,
-                        "category_id": "$cat2"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv2",
-                    "endpoint": "/inventory/$prod2",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 50
-                    }
-                },
-                {
-                    "id": "prod3",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Inventory Product B",
-                        "price": 20.0,
-                        "category_id": "$cat2"
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {},
             "body": null
         },
         "expected_status": 200,
+        "setup": null,
         "cleanup": null
+    },
+    {
+        "name": "categories_report_empty_db",
+        "category": "HAPPY_PATH",
+        "description": "Category performance report on empty database returns empty array",
+        "endpoint": "/reports/categories",
+        "method": "GET",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "users_report_empty_db",
+        "category": "HAPPY_PATH",
+        "description": "User activity report on empty database returns empty array",
+        "endpoint": "/reports/users",
+        "method": "GET",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "setup": null,
+        "cleanup": null
+    },
+    {
+        "name": "setup_create_user1",
+        "category": "SETUP",
+        "description": "Create first test user for report data seeding",
+        "endpoint": "/users",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "email": "report_user1@test.com",
+                "name": "Report User One"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "user1_id": "id"
+        }
+    },
+    {
+        "name": "setup_create_user2",
+        "category": "SETUP",
+        "description": "Create second test user for report data seeding",
+        "endpoint": "/users",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "email": "report_user2@test.com",
+                "name": "Report User Two"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "user2_id": "id"
+        }
+    },
+    {
+        "name": "setup_create_category1",
+        "category": "SETUP",
+        "description": "Create first test category for report data seeding",
+        "endpoint": "/categories",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "name": "Electronics Report",
+                "description": "Electronics category for report tests"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "cat1_id": "id"
+        }
+    },
+    {
+        "name": "setup_create_category2",
+        "category": "SETUP",
+        "description": "Create second test category for report data seeding",
+        "endpoint": "/categories",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "name": "Books Report",
+                "description": "Books category for report tests"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "cat2_id": "id"
+        }
+    },
+    {
+        "name": "setup_create_product1",
+        "category": "SETUP",
+        "description": "Create first test product in category 1",
+        "endpoint": "/products",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "name": "Laptop Report",
+                "price": 999.99,
+                "category_id": "$stored.cat1_id"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "prod1_id": "id"
+        }
+    },
+    {
+        "name": "setup_create_product2",
+        "category": "SETUP",
+        "description": "Create second test product in category 2",
+        "endpoint": "/products",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "name": "Novel Report",
+                "price": 14.99,
+                "category_id": "$stored.cat2_id"
+            }
+        },
+        "expected_status": 200,
+        "store": {
+            "prod2_id": "id"
+        }
+    },
+    {
+        "name": "setup_update_inventory1",
+        "category": "SETUP",
+        "description": "Set inventory quantity for product 1 to 100",
+        "endpoint": "/inventory/{product_id}",
+        "method": "PUT",
+        "request_data": {
+            "path": {
+                "product_id": "$stored.prod1_id"
+            },
+            "body": {
+                "quantity": 100
+            }
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "setup_update_inventory2",
+        "category": "SETUP",
+        "description": "Set inventory quantity for product 2 to 150",
+        "endpoint": "/inventory/{product_id}",
+        "method": "PUT",
+        "request_data": {
+            "path": {
+                "product_id": "$stored.prod2_id"
+            },
+            "body": {
+                "quantity": 150
+            }
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "setup_create_order1",
+        "category": "SETUP",
+        "description": "Create order for user1 with both products",
+        "endpoint": "/orders",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "user_id": "$stored.user1_id",
+                "items": [
+                    {
+                        "product_id": "$stored.prod1_id",
+                        "quantity": 2
+                    },
+                    {
+                        "product_id": "$stored.prod2_id",
+                        "quantity": 5
+                    }
+                ]
+            }
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "setup_create_order2",
+        "category": "SETUP",
+        "description": "Create order for user2 with product 1",
+        "endpoint": "/orders",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "user_id": "$stored.user2_id",
+                "items": [
+                    {
+                        "product_id": "$stored.prod1_id",
+                        "quantity": 1
+                    }
+                ]
+            }
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "setup_create_user_noorders",
+        "category": "SETUP",
+        "description": "Create user with no orders for boundary test",
+        "endpoint": "/users",
+        "method": "POST",
+        "request_data": {
+            "body": {
+                "email": "noorders@test.com",
+                "name": "No Orders User"
+            }
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "sales_report_with_data",
+        "category": "HAPPY_PATH",
+        "description": "Sales report returns aggregated data after seeding users, products, and orders",
+        "endpoint": "/reports/sales",
+        "method": "GET",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "inventory_report_default_threshold",
+        "category": "HAPPY_PATH",
+        "description": "Inventory report with default low_stock_threshold returns inventory summary",
+        "endpoint": "/reports/inventory",
+        "method": "GET",
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200
     },
     {
         "name": "inventory_report_custom_threshold",
         "category": "BOUNDARY",
+        "description": "Inventory report with custom low_stock_threshold query parameter",
         "endpoint": "/reports/inventory",
         "method": "GET",
-        "description": "Inventory report with custom low_stock_threshold query parameter",
-        "setup": {
-            "steps": [
-                {
-                    "id": "cat3",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Threshold Test Category",
-                        "description": "Category for threshold test"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod4",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Threshold Product",
-                        "price": 15.0,
-                        "category_id": "$cat3"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv3",
-                    "endpoint": "/inventory/$prod4",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 5
-                    }
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {
@@ -256,385 +356,66 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             },
             "body": null
         },
-        "expected_status": 200,
-        "cleanup": null
-    },
-    {
-        "name": "products_report_empty_db",
-        "category": "HAPPY_PATH",
-        "endpoint": "/reports/products",
-        "method": "GET",
-        "description": "Product performance report on empty database returns empty array",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
+        "expected_status": 200
     },
     {
         "name": "products_report_with_orders",
         "category": "HAPPY_PATH",
+        "description": "Product performance report returns metrics after seeding products and orders",
         "endpoint": "/reports/products",
         "method": "GET",
-        "description": "Product performance report returns metrics after creating products and orders",
-        "setup": {
-            "steps": [
-                {
-                    "id": "user2",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "prodreport@test.com",
-                        "name": "Product Report User"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "cat4",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Product Report Category",
-                        "description": "Test"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod5",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Product Report Item A",
-                        "price": 50.0,
-                        "category_id": "$cat4"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv4",
-                    "endpoint": "/inventory/$prod5",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 200
-                    }
-                },
-                {
-                    "id": "prod6",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Product Report Item B",
-                        "price": 25.0,
-                        "category_id": "$cat4"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv5",
-                    "endpoint": "/inventory/$prod6",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 150
-                    }
-                },
-                {
-                    "id": "order2",
-                    "endpoint": "/orders",
-                    "method": "POST",
-                    "body": {
-                        "user_id": "$user2",
-                        "items": [
-                            {
-                                "product_id": "$prod5",
-                                "quantity": 2
-                            },
-                            {
-                                "product_id": "$prod6",
-                                "quantity": 5
-                            }
-                        ]
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {},
             "body": null
         },
-        "expected_status": 200,
-        "cleanup": null
-    },
-    {
-        "name": "categories_report_empty_db",
-        "category": "HAPPY_PATH",
-        "endpoint": "/reports/categories",
-        "method": "GET",
-        "description": "Category performance report on empty database returns empty array",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
+        "expected_status": 200
     },
     {
         "name": "categories_report_with_data",
         "category": "HAPPY_PATH",
+        "description": "Category performance report returns metrics after seeding categories, products, and orders",
         "endpoint": "/reports/categories",
         "method": "GET",
-        "description": "Category performance report returns metrics after creating categories, products, and orders",
-        "setup": {
-            "steps": [
-                {
-                    "id": "user3",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "catreport@test.com",
-                        "name": "Category Report User"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "cat5",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Electronics Cat Report",
-                        "description": "Electronics category for report"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "cat6",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "Books Cat Report",
-                        "description": "Books category for report"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod7",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Laptop Cat Report",
-                        "price": 999.99,
-                        "category_id": "$cat5"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv6",
-                    "endpoint": "/inventory/$prod7",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 30
-                    }
-                },
-                {
-                    "id": "prod8",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "Novel Cat Report",
-                        "price": 14.99,
-                        "category_id": "$cat6"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv7",
-                    "endpoint": "/inventory/$prod8",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 100
-                    }
-                },
-                {
-                    "id": "order3",
-                    "endpoint": "/orders",
-                    "method": "POST",
-                    "body": {
-                        "user_id": "$user3",
-                        "items": [
-                            {
-                                "product_id": "$prod7",
-                                "quantity": 1
-                            },
-                            {
-                                "product_id": "$prod8",
-                                "quantity": 3
-                            }
-                        ]
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {},
             "body": null
         },
-        "expected_status": 200,
-        "cleanup": null
-    },
-    {
-        "name": "users_report_empty_db",
-        "category": "HAPPY_PATH",
-        "endpoint": "/reports/users",
-        "method": "GET",
-        "description": "User activity report on empty database returns empty array",
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": null
-        },
-        "expected_status": 200,
-        "setup": null,
-        "cleanup": null
+        "expected_status": 200
     },
     {
         "name": "users_report_with_orders",
         "category": "HAPPY_PATH",
+        "description": "User activity report returns per-user metrics after seeding users and orders",
         "endpoint": "/reports/users",
         "method": "GET",
-        "description": "User activity report returns per-user metrics after creating users and orders",
-        "setup": {
-            "steps": [
-                {
-                    "id": "user4",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "userrpt1@test.com",
-                        "name": "User Report Alice"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "user5",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "userrpt2@test.com",
-                        "name": "User Report Bob"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "cat7",
-                    "endpoint": "/categories",
-                    "method": "POST",
-                    "body": {
-                        "name": "User Report Category",
-                        "description": "Category for user report test"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "prod9",
-                    "endpoint": "/products",
-                    "method": "POST",
-                    "body": {
-                        "name": "User Report Widget",
-                        "price": 35.0,
-                        "category_id": "$cat7"
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "inv8",
-                    "endpoint": "/inventory/$prod9",
-                    "method": "PUT",
-                    "body": {
-                        "quantity": 500
-                    }
-                },
-                {
-                    "id": "order4",
-                    "endpoint": "/orders",
-                    "method": "POST",
-                    "body": {
-                        "user_id": "$user4",
-                        "items": [
-                            {
-                                "product_id": "$prod9",
-                                "quantity": 4
-                            }
-                        ]
-                    },
-                    "extract_id_from": "id"
-                },
-                {
-                    "id": "order5",
-                    "endpoint": "/orders",
-                    "method": "POST",
-                    "body": {
-                        "user_id": "$user5",
-                        "items": [
-                            {
-                                "product_id": "$prod9",
-                                "quantity": 1
-                            }
-                        ]
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {},
             "body": null
         },
-        "expected_status": 200,
-        "cleanup": null
+        "expected_status": 200
     },
     {
         "name": "users_report_user_with_no_orders",
         "category": "BOUNDARY",
+        "description": "User activity report includes users with zero orders showing total_orders=0 and total_spent=0",
         "endpoint": "/reports/users",
         "method": "GET",
-        "description": "User activity report includes users with zero orders showing total_orders=0 and total_spent=0",
-        "setup": {
-            "steps": [
-                {
-                    "id": "user6",
-                    "endpoint": "/users",
-                    "method": "POST",
-                    "body": {
-                        "email": "noorders@test.com",
-                        "name": "No Orders User"
-                    },
-                    "extract_id_from": "id"
-                }
-            ]
-        },
         "request_data": {
             "path": {},
             "query": {},
             "body": null
         },
-        "expected_status": 200,
-        "cleanup": null
+        "expected_status": 200
     }
 ]''')
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("")
-HEALTH_CHECK_ENDPOINT = os.path.expandvars("")
+BASE_URL = os.path.expandvars("http://localhost:8000")
+HEALTH_CHECK_ENDPOINT = os.path.expandvars("/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
 # Per-endpoint routing table for microservices DST
