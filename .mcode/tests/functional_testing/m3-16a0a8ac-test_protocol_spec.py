@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-26T06:04:01.925336+00:00
+Generated at: 2026-03-26T06:08:29.490701+00:00
 Project: shop-1
 Milestone: 3
 """
@@ -369,7 +369,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "MISSING_REQUIRED",
         "endpoint": "/orders",
         "method": "POST",
-        "description": "Attempt to create an order without the items field, expect 400 or 422 validation error",
+        "description": "Attempt to create an order without the items field, expect 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
@@ -377,14 +377,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "user_id": 1
             }
         },
-        "expected_status": 400
+        "expected_status": 422
     },
     {
         "name": "create_order_missing_user_id",
         "category": "MISSING_REQUIRED",
         "endpoint": "/orders",
         "method": "POST",
-        "description": "Attempt to create an order without the user_id field, expect 400 or 422 validation error",
+        "description": "Attempt to create an order without the user_id field, expect 422 validation error",
         "request_data": {
             "path": {},
             "query": {},
@@ -397,14 +397,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 ]
             }
         },
-        "expected_status": 400
+        "expected_status": 422
     }
 ]''')
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("")
-HEALTH_CHECK_ENDPOINT = os.path.expandvars("")
+BASE_URL = os.path.expandvars("http://localhost:8000")
+HEALTH_CHECK_ENDPOINT = os.path.expandvars("/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
 # Per-endpoint routing table for microservices DST
