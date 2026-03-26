@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-26T05:58:07.135394+00:00
+Generated at: 2026-03-26T05:59:49.338306+00:00
 Project: shop-1
 Milestone: 1
 """
@@ -114,7 +114,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "MISSING_REQUIRED",
         "endpoint": "/users",
         "method": "POST",
-        "description": "Attempt to create a user without the required email field, expect 422 validation error",
+        "description": "Attempt to create a user without the required email field, expect 500 because SQLModel table models do not validate missing fields",
         "setup": null,
         "request_data": {
             "path": {},
@@ -123,7 +123,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "name": "No Email User"
             }
         },
-        "expected_status": 422,
+        "expected_status": 500,
         "cleanup": null
     },
     {
@@ -131,7 +131,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "MISSING_REQUIRED",
         "endpoint": "/users",
         "method": "POST",
-        "description": "Attempt to create a user without the required name field, expect 422 validation error",
+        "description": "Attempt to create a user without the required name field, expect 500 because SQLModel table models do not validate missing fields",
         "setup": null,
         "request_data": {
             "path": {},
@@ -140,7 +140,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "email": "noname@example.com"
             }
         },
-        "expected_status": 422,
+        "expected_status": 500,
         "cleanup": null
     },
     {
